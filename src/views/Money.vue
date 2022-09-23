@@ -1,10 +1,12 @@
 <template>
-  <div>momey</div>
+  <div>momey
+    <Nav/>
+  </div>
 </template>
 
 <script lang="ts">
 export default {
-  name: 'Money'
+  name: 'Money',
 };
 </script>
 
