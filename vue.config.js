@@ -1,12 +1,5 @@
-eslint-disable-next-line @typescript-eslint/no-var-requires
-// const {defineConfig} = require('@vue/cli-service')
-// let moudle
-// moudle.exports = defineConfig({
-//   transpileDependence: true,
-//   lintOnSave:  false
-// })
-
 const path = require('path')
+const typescript = require('typescript')
 module.exports = {
   lintOnSave: false,
   chainWebpack: config => {
