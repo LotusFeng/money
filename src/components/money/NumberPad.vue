@@ -58,7 +58,6 @@ export default class NumberPad extends Vue {
     this.output = '0';
   }
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  ok()
 }
 
 
