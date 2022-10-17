@@ -3,7 +3,7 @@
     <NumberPad/>
     <Types/>
     <Notes/>
-    <Tags :data-source="tags"/>
+    <Tags :data-source.sync="tags"/>
   </Layout>
 </template>
 
@@ -16,6 +16,7 @@ import Tags from '@/components/money/Tags.vue'
 export default {
   name: 'Money',
   components: {Tags, Notes, Types, NumberPad},
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data() {
     return{
       tags: ['衣', '食', '住', '行']
