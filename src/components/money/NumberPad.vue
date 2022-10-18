@@ -29,13 +29,12 @@ export default class NumberPad extends Vue {
   @Prop() readonly value!: number;
   output = this.value.toString();
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   inputContent(event: MouseEvent) {
     const button = (event.target as HTMLButtonElement);
-    const input = button.textContent as string;
+    const input = button.textContent!;
+    if (this.output.length === 16) { return; }
     if (this.output === '0') {
-      if (input === '0') {return;}
-      if ('123456789'.indexOf(input) >= 0) {
+      if ('0123456789'.indexOf(input) >= 0) {
         this.output = input;
       } else {
         this.output += input;
@@ -46,7 +45,6 @@ export default class NumberPad extends Vue {
     this.output += input;
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   remove() {
     if (this.output.length === 1) {
       this.output = '0';
@@ -55,20 +53,16 @@ export default class NumberPad extends Vue {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   clear() {
     this.output = '0';
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   ok() {
     this.$emit('update:value', this.output);
     this.$emit('submit', this.output);
-    this.output =  '0';
+    this.output = '0';
   }
 }
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -136,5 +130,4 @@ export default class NumberPad extends Vue {
     }
   }
 }
-
 </style>
