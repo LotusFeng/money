@@ -1,5 +1,5 @@
 <template>
-  <layout>
+  <Layout>
     <div class="navBar">
       <Icon class="leftIcon" name="left" @click="goBack"/>
       <span class="title">编辑标签</span>
@@ -13,7 +13,7 @@
     <div class="button-wrapper">
       <Button @click="remove">删除标签</Button>
     </div>
-  </layout>
+  </Layout>
 </template>
 
 <script lang="ts">
@@ -35,7 +35,7 @@ export default class EditLabel extends Vue {
   }
   update(name: string) {
     if (this.tag) {
-     store.updateTag(this.tag.id, name);
+      store.updateTag(this.tag.id, name);
     }
   }
   remove() {
