@@ -4,7 +4,7 @@
       <router-link class="tag"
                    v-for="tag in tags" :key="tag.id"
                    :to="`/labels/edit/${tag.id}`">
-        <span>{{ tag.name }}</span>
+        <span>{{tag.name}}</span>
         <Icon name="right"/>
       </router-link>
     </div>
@@ -22,11 +22,11 @@ import Vue from 'vue';
 import {Component} from 'vue-property-decorator';
 import Button from '@/components/Button.vue';
 import {mixins} from 'vue-class-component';
-import TapHelper from '@/mixins/TapHelper';
+import TagHelper from '../mixins/TagHelper';
 
 @Component({
   components: {Button},})
-  export default class Labels extends mixins(TapHelper) {
+  export default class Labels extends mixins(TagHelper) {
     get tags() {
       return this.$store.state.tagList;
     }
