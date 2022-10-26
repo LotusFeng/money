@@ -19,28 +19,32 @@
 <script lang="ts">
 import Vue from 'vue';
 import {Component} from 'vue-property-decorator';
-import FormItem from '@/components/money/FormItem.vue';
+import FormItem from '@/components/Money/FormItem.vue';
 import Button from '@/components/Button.vue';
 @Component({
-  components: {Button, FormItem}
+  components: {Button, FormItem},
 })
 export default class EditLabel extends Vue {
-  tag?: Tag = undefined;
+  get tag() {
+    return this.$store.state.currentTag;
+  }
   created() {
-    // this.tag = store.findTag(this.$route.params.id);
+    const id = this.$route.params.id;
+    this.$store.commit('setCurrentTag', id);
     if (!this.tag) {
       this.$router.replace('/404');
     }
   }
   update(name: string) {
     if (this.tag) {
+      // TODO
       // store.updateTag(this.tag.id, name);
     }
   }
   remove() {
     if (this.tag) {
       // TODO
-      return
+      return;
       // if (store.removeTag(this.tag.id)) {
       //   this.$router.back();
       // } else {
@@ -53,7 +57,6 @@ export default class EditLabel extends Vue {
   }
 }
 </script>
-
 <style lang="scss" scoped>
 .navBar {
   text-align: center;
@@ -63,21 +66,26 @@ export default class EditLabel extends Vue {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   > .title {
   }
+
   > .leftIcon {
     width: 24px;
     height: 24px;
   }
+
   > .rightIcon {
     width: 24px;
     height: 24px;
   }
 }
+
 .form-wrapper {
   background: white;
   margin-top: 8px;
 }
+
 .button-wrapper {
   text-align: center;
   padding: 16px;

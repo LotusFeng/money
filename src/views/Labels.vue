@@ -25,18 +25,16 @@ import {mixins} from 'vue-class-component';
 import TapHelper from '@/mixins/TapHelper';
 
 @Component({
-  components: {Button},
-  computed: {
-    tags() {
+  components: {Button},})
+  export default class Labels extends mixins(TapHelper) {
+    get tags() {
       return this.$store.state.tagList;
-    },
+    }
+
+    beforeCreate() {
+      this.$store.commit('fetchTags');
+    }
   }
-})
-export default class Labels extends mixins(TapHelper) {
-  beforeCreate() {
-    this.$store.commit('fetchTags');
-  }
-}
 </script>
 
 <style lang="scss" scoped>
