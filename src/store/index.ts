@@ -50,6 +50,7 @@ const store = new Vuex.Store({
       } else {
         window.alert('删除失败');
       }
+
     },
     fetchRecords(state) {
       state.recordList = JSON.parse(window.localStorage.getItem('recordList') || '[]') as RecordItem[];
@@ -61,7 +62,8 @@ const store = new Vuex.Store({
       store.commit('saveRecords');
     },
     saveRecords(state) {
-      window.localStorage.setItem('recordList', JSON.stringify(state.recordList));
+      window.localStorage.setItem('recordList',
+        JSON.stringify(state.recordList));
     },
     fetchTags(state) {
       state.tagList = JSON.parse(window.localStorage.getItem('tagList') || '[]');
@@ -75,7 +77,6 @@ const store = new Vuex.Store({
       state.tagList.push({id, name: name});
       store.commit('saveTags');
       window.alert('添加成功');
-      return 'success';
     },
     saveTags(state) {
       window.localStorage.setItem('tagList', JSON.stringify(state.tagList));
