@@ -10,8 +10,8 @@
                 @update:value="update"
                 field-name="标签名" placeholder="请输入标签名"/>
     </div>
-    <div class="button-wrapper">
-      <Button @click="remove">删除标签</Button>
+    <div class="removeTag-wrapper">
+      <button class="removeTag" @click="remove">删除标签</button>
     </div>
   </Layout>
 </template>
@@ -82,9 +82,19 @@ export default class EditLabel extends Vue {
   margin-top: 8px;
 }
 
-.button-wrapper {
-  text-align: center;
-  padding: 16px;
-  margin-top: 44-16px;
+
+.removeTag {
+  background: #767676;
+  color: white;
+  border-radius: 4px;
+  border: none;
+  height: 40px;
+  padding: 0 16px;
+  &-wrapper {
+    position: center;
+    text-align: center;
+    padding: 16px;
+    margin-top: 44-16px;
+  }
 }
 </style>
