@@ -1,6 +1,7 @@
 <template>
   <Layout>
     <Tabs class-prefix="type" :data-source="recordTypeList" :value.sync="type"/>
+    <chart :options="x"/>
     <ol v-if="groupedList.length>0">
       <li v-for="(group, index) in groupedList" :key="index">
         <h3 class="title">{{ beautify(group.title) }} <span>￥{{ group.total }}</span></h3>
@@ -27,9 +28,10 @@ import Tabs from '@/components/Tabs.vue';
 import recordTypeList from '@/constants/recordTypeList';
 import dayjs from 'dayjs';
 import clone from '@/lib/clone';
+import Chart from '@/components/Chart.vue';
 
 @Component({
-  components: {Tabs},
+  components: {Tabs, Chart},
 })
 export default class Statistics extends Vue {
   tagString(tags: Tag[]) {
@@ -42,7 +44,6 @@ export default class Statistics extends Vue {
     if (day.isSame(now, 'day')) {
       return '今天';
     } else if (day.isSame(now.subtract(1, 'day'), 'day')) {
-      console.log('hi');
       return '昨天';
     } else if (day.isSame(now.subtract(2, 'day'), 'day')) {
       return '前天';
@@ -51,6 +52,47 @@ export default class Statistics extends Vue {
     } else {
       return day.format('YYYY年M月D日');
     }
+  }
+
+  get x() {
+    return {
+      tooltip: {
+        trigger: 'item'
+      },
+      legend: {
+        top: '5%',
+        left: 'center'
+      },
+      series: [
+        {
+          name: 'Access From',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          avoidLabelOverlap: false,
+          label: {
+            show: false,
+            position: 'center'
+          },
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: '40',
+              fontWeight: 'bold'
+            }
+          },
+          labelLine: {
+            show: false
+          },
+          data: [
+            { value: 1048, name: 'Search Engine' },
+            { value: 735, name: 'Direct' },
+            { value: 580, name: 'Email' },
+            { value: 484, name: 'Union Ads' },
+            { value: 300, name: 'Video Ads' }
+          ]
+        }
+      ]
+    };
   }
 
   get recordList() {
@@ -76,8 +118,6 @@ export default class Statistics extends Vue {
     }
     result.map(group => {
       group.total = group.items.reduce((sum, item) => {
-        console.log(sum);
-        console.log(item);
         return sum + item.amount;
       }, 0);
     });
@@ -94,6 +134,10 @@ export default class Statistics extends Vue {
 </script>
 
 <style scoped lang="scss">
+.echarts {
+  max-width: 100%;
+  height: 400px;
+}
 .noResult {
   padding: 16px;
   text-align: center;

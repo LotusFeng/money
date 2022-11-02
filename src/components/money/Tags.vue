@@ -34,9 +34,11 @@ export default class Tags extends mixins(TagHelper) {
     const index = this.selectedTags.indexOf(tag);
     if (index >= 0) {
       this.selectedTags.splice(index, 1);
-    } else {
-      this.selectedTags.push(tag);
-    }
+    } else if (this.selectedTags.length >=1) {
+      this.selectedTags.splice(0, 1);
+    } {
+        this.selectedTags.push(tag);
+      }
     this.$emit('update:value', this.selectedTags);
   }
 }
@@ -69,6 +71,7 @@ export default class Tags extends mixins(TagHelper) {
       &.selected {
         background: darken($bg, 50%);
         color: white;
+
       }
     }
   }
