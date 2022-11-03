@@ -1,17 +1,19 @@
 <template>
   <Layout>
     <Tabs class-prefix="type" :data-source="recordTypeList" :value.sync="type"/>
-    <chart :options="x"/>
+    <div class="chart-wrapper" ref="chartWrapper">
+      <Chart class="chart" :options="chartOptions"/>
+    </div>
     <ol v-if="groupedList.length>0">
       <li v-for="(group, index) in groupedList" :key="index">
-        <h3 class="title">{{ beautify(group.title) }} <span>￥{{ group.total }}</span></h3>
+        <h3 class="title">{{beautify(group.title)}} <span>￥{{group.total}}</span></h3>
         <ol>
           <li v-for="item in group.items" :key="item.id"
               class="record"
           >
-            <span>{{ tagString(item.tags) }}</span>
-            <span class="notes">{{ item.notes }}</span>
-            <span>￥{{ item.amount }} </span>
+            <span>{{tagString(item.tags)}}</span>
+            <span class="notes">{{item.notes}}</span>
+            <span>￥{{item.amount}} </span>
           </li>
         </ol>
       </li>
@@ -21,6 +23,7 @@
     </div>
   </Layout>
 </template>
+
 <script lang="ts">
 import Vue from 'vue';
 import {Component} from 'vue-property-decorator';
@@ -29,21 +32,29 @@ import recordTypeList from '@/constants/recordTypeList';
 import dayjs from 'dayjs';
 import clone from '@/lib/clone';
 import Chart from '@/components/Chart.vue';
+import day from 'dayjs';
+import _, {forEach, sum} from 'lodash';
+
 
 @Component({
   components: {Tabs, Chart},
 })
 export default class Statistics extends Vue {
   tagString(tags: Tag[]) {
-    return tags.length === 0 ? '无' : tags.map(t => t.name).join('，');
+    return tags.length === 0 ? '无' :
+        tags.map(t => t.name).join('，');
   }
-
+  mounted() {
+    const div = (this.$refs.chartWrapper as HTMLDivElement);
+    div.scrollLeft = div.scrollWidth;
+  }
   beautify(string: string) {
     const day = dayjs(string);
     const now = dayjs();
     if (day.isSame(now, 'day')) {
       return '今天';
     } else if (day.isSame(now.subtract(1, 'day'), 'day')) {
+      console.log('hi');
       return '昨天';
     } else if (day.isSame(now.subtract(2, 'day'), 'day')) {
       return '前天';
@@ -53,58 +64,84 @@ export default class Statistics extends Vue {
       return day.format('YYYY年M月D日');
     }
   }
-
-  get x() {
+  get keyValueList() {
+    const today = new Date();
+    const array = [];
+    console.log(this.groupedList);
+    for (let i = 0; i <= 29; i++) {
+      // this.recordList = [{date:7.3, value:100}, {date:7.2, value:200}]
+      const dateString = day(today)
+          .subtract(i, 'day').format('YYYY-MM-DD');
+      const found = _.find(this.groupedList, {
+        title: dateString
+      });
+      array.push({
+        key: dateString, value: found ? found.total : 0
+      });
+    }
+    array.sort((a, b) => {
+      if (a.key > b.key) {
+        return 1;
+      } else if (a.key === b.key) {
+        return 0;
+      } else {
+        return -1;
+      }
+    });
+    console.log('array');
+    console.log(array);
+    return array;
+  }
+  get chartOptions() {
+    const keys = this.keyValueList.map(item => item.key);
+    const values = this.keyValueList.map(item => item.value);
+    console.log('values');
+    console.log(values);
     return {
-      tooltip: {
-        trigger: 'item'
+      grid: {
+        left: 0,
+        right: 0,
       },
-      legend: {
-        top: '5%',
-        left: 'center'
-      },
-      series: [
-        {
-          name: 'Access From',
-          type: 'pie',
-          radius: ['40%', '70%'],
-          avoidLabelOverlap: false,
-          label: {
-            show: false,
-            position: 'center'
-          },
-          emphasis: {
-            label: {
-              show: true,
-              fontSize: '40',
-              fontWeight: 'bold'
-            }
-          },
-          labelLine: {
-            show: false
-          },
-          data: [
-            { value: 1048, name: 'Search Engine' },
-            { value: 735, name: 'Direct' },
-            { value: 580, name: 'Email' },
-            { value: 484, name: 'Union Ads' },
-            { value: 300, name: 'Video Ads' }
-          ]
+      xAxis: {
+        type: 'category',
+        data: keys,
+        axisTick: {alignWithLabel: true},
+        axisLine: {lineStyle: {color: '#666'}},
+        axisLabel: {
+          formatter: function (value: string, index: number) {
+            return value.substr(5);
+          }
         }
-      ]
+      },
+      yAxis: {
+        type: 'value',
+        show: false
+      },
+      series: [{
+        symbol: 'circle',
+        symbolSize: 12,
+        itemStyle: {borderWidth: 1, color: '#666', borderColor: '#666'},
+        // lineStyle: {width: 10},
+        data: values,
+        type: 'line'
+      }],
+      tooltip: {
+        show: true, triggerOn: 'click',
+        position: 'top',
+        formatter: '{c}'
+      }
     };
   }
-
   get recordList() {
     return (this.$store.state as RootState).recordList;
   }
-
   get groupedList() {
+    console.log('grouped list 被读取了');
     const {recordList} = this;
     const newList = clone(recordList)
         .filter(r => r.type === this.type)
         .sort((a, b) => dayjs(b.createdAt).valueOf() - dayjs(a.createdAt).valueOf());
-    if (recordList.length === 0) {return [];}
+    if (newList.length === 0) {return [];}
     type Result = { title: string, total?: number, items: RecordItem[] }[]
     const result: Result = [{title: dayjs(newList[0].createdAt).format('YYYY-MM-DD'), items: [newList[0]]}];
     for (let i = 1; i < newList.length; i++) {
@@ -123,11 +160,9 @@ export default class Statistics extends Vue {
     });
     return result;
   }
-
   beforeCreate() {
     this.$store.commit('fetchRecords');
   }
-
   type = '-';
   recordTypeList = recordTypeList;
 }
@@ -145,21 +180,17 @@ export default class Statistics extends Vue {
 ::v-deep {
   .type-tabs-item {
     background: #C4C4C4;
-
     &.selected {
       background: white;
-
       &::after {
         display: none;
       }
     }
   }
-
   .interval-tabs-item {
     height: 48px;
   }
 }
-
 %item {
   padding: 8px 16px;
   line-height: 24px;
@@ -167,19 +198,25 @@ export default class Statistics extends Vue {
   justify-content: space-between;
   align-content: center;
 }
-
 .title {
   @extend %item;
 }
-
 .record {
   background: white;
   @extend %item;
 }
-
 .notes {
   margin-right: auto;
   margin-left: 16px;
   color: #999;
+}
+.chart {
+  width: 430%;
+  &-wrapper {
+    overflow: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
 }
 </style>
